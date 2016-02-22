@@ -24,51 +24,7 @@
 #include "Ball.h"
 
 using namespace cv;
-/*
-#define KB_UP 72
-#define KB_DOWN 80
-#define KB_LEFT 75
-#define KB_RIGHT 77
-int KB_code=0;
 
-void simple_keyboard_input()
-{
-    if (_kbhit())
-      {
-            KB_code = _getch();
-            //cout<<"KB_code = "<<KB_code<<"\n";
-
-            switch (KB_code)
-            {
-
-            
-
-                case KB_LEFT:
-					vertical_left_top.x--;
-					vertical_left_bottom.x--;
-					std::cout<<"KB_code = "<<KB_code<<"\n";
-
-                break;
-
-				case KB_RIGHT:					
-					vertical_left_top.x++;
-					vertical_left_bottom.x++;
-                break;
-
-                case KB_UP:
-                           //Do something                     
-                break;
-
-                case KB_DOWN:
-                           //Do something                     
-                break;
-
-            }        
-
-      }
-
-}
-*/
 
 int main(int argc, char* argv[])
 {
@@ -163,6 +119,10 @@ int main(int argc, char* argv[])
 		// Case 1: Initial loop run --> search whole picture
 		if (initial == true)
 		{
+			// delete later
+			//std::cout <<   "deltax:" << line_delta_x << "\n";          
+			//std::cout <<   "deltay:" << line_delta_y << "\n";          
+
 			searchSection = false;
 			initial = false;
 			mycase = 1;
@@ -207,13 +167,15 @@ int main(int argc, char* argv[])
 			ballcd.x = state.at<float>(0); //calculate the center of the predRect, which is equal to the state x,y
 			ballcd.y = state.at<float>(1);
 			coordinatesToPx(ballpx.x, ballpx.y, ballcd.x, ballcd.y);
+			std::cout << "xpx:" << ballpx.x << "; ypx:" << ballpx.y << "; xcd:" << ballcd.x << "; ycd:" << ballcd.y << "\n"; 
 			// draw circle into the resulting picture, centered around predicted location, and radius 2
-			cv::circle(cameraFeed, ballpx, 2, CV_RGB(255, 0, 0), -1);
+			cv::circle(cameraFeed, ballpx, 10, CV_RGB(0, 255, 0), 2);
+			cv::circle(cameraFeed, ballpx, 2, CV_RGB(0, 255, 0), -1);
 
 			// create and intialize prediction rectangle
 			predRect.width = state.at<float>(4); //specify width of prediction rectangle by the predicted width
 			predRect.height = state.at<float>(5); // specify height of prediction rectangle
-			predRect.x = ballpx.x - 250 / 2; // calculate the top left corner x //ACHTUNG HIER ETWAS GEÄNDERT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+			predRect.x = ballpx.x - 250 / 2; // calculate the top left corner x 
 			predRect.y = ballpx.y - 250 / 2; // calculate the top left corner y
 			// adjust predRect to make sure it is within picture
 			adjustPredRect(predRect);
@@ -263,7 +225,8 @@ int main(int argc, char* argv[])
 			}
 			// after calculating the ball's px location, calculate coordinates
 			pxToCoordinates(ballpx.x, ballpx.y, ballcd.x, ballcd.y); //?
-			//cv::circle(cameraFeed, ballpx, 5, CV_RGB(20, 150, 20), -1);
+			cv::circle(cameraFeed, ballpx, 10, CV_RGB(255, 0, 0), 1);
+			cv::circle(cameraFeed, ballpx, 2, CV_RGB(255, 0, 0), -1);
 
 			numAttempt = 0; //set the notFoundCount to 0
 

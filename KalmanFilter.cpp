@@ -24,7 +24,7 @@ cv::KalmanFilter createKalmanFilter(int stateSize, int measSize, int contrSize, 
 	kf.processNoiseCov.at<float>(21) = 5.0f;
 	kf.processNoiseCov.at<float>(28) = 1e-2;
 	kf.processNoiseCov.at<float>(35) = 1e-2;
-	cv::setIdentity(kf.measurementNoiseCov, cv::Scalar(1e-5)); //GEÄNDERT!!!!!!!!! R 1e-1
+	cv::setIdentity(kf.measurementNoiseCov, cv::Scalar(1e-1)); //GEÄNDERT!!!!!!!!! R 1e-1
 	kf.errorCovPre.at<float>(0) = 1; // px
 	kf.errorCovPre.at<float>(7) = 1; // px
 	kf.errorCovPre.at<float>(14) = 1;
