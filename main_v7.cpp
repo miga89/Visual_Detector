@@ -29,6 +29,14 @@ using namespace cv;
 int main(int argc, char* argv[])
 {
 
+	// compute matrices for removal of distortion
+	Mat cameraMatrix = (Mat_<float>(3,3) << 1403.5, 950.8236, 0, 0, 1400.8, 586.2946,0,0,1);
+	Mat distCoeffs = (Mat_<float>(1,5) << -0.1977, 0.2083, 0, 0, -0.1146);
+	Mat a = Mat_<Point2f>;
+	a
+	Mat b;
+	undistortPoints(a,b,cameraMatrix,distCoeffs);
+	std::cout << b;
 	//Matrix to store each frame of the webcam feed, Mat is an opencv c++ n-dimensional array class
 	Mat cameraFeed, frame, croppedFrame;
 	//matrix storage for HSV image
