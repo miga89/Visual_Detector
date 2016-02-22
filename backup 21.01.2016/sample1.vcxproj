@@ -157,6 +157,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Ball.cpp" />
+    <ClCompile Include="Converter.cpp" />
+    <ClCompile Include="Display.cpp" />
+    <ClCompile Include="Functions.cpp" />
+    <ClCompile Include="ImageAquisition.cpp" />
+    <ClCompile Include="ImageProcessing.cpp" />
+    <ClCompile Include="KalmanFilter.cpp" />
     <ClCompile Include="main_v5_working.cpp" />
     <ClCompile Include="main_v6.cpp" />
     <ClCompile Include="tutorial3_objectTracking.cpp" />

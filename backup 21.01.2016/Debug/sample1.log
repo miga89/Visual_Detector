@@ -1,0 +1,9 @@
+﻿Der Buildvorgang wurde am 22.02.2016 12:49:19 gestartet.
+     1>Projekt "D:\Eigene Dateien\Visual Studio 2012\Projects\sample1\sample1\backup 21.01.2016\sample1.vcxproj" auf Knoten "2", Build Ziel(e).
+       Die Projektdatei enthält ToolsVersion="12.0". Dieses Toolset ist möglicherweise nicht bekannt oder nicht vorhanden. In diesem Fall können Sie das Problem möglicherweise beheben, indem Sie die entsprechende Version von MSBuild installieren. Oder für den Build wurde aufgrund der Richtlinie eine bestimmte ToolsVersion erzwungen. Das Projekt wird behandelt, als enthielte es ToolsVersion="4.0". Weitere Informationen finden Sie unter http://go.microsoft.com/fwlink/?LinkId=291333. 
+     1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V110\Microsoft.Cpp.Platform.targets(44,5): error MSB8020: The builds tools for v120 (Platform Toolset = 'v120') cannot be found. To build using the v120 build tools, either click the Project menu or right-click the solution, and then select "Update VC++ Projects...". Install v120 to build using the v120 build tools.
+     1>Die Erstellung des Projekts "D:\Eigene Dateien\Visual Studio 2012\Projects\sample1\sample1\backup 21.01.2016\sample1.vcxproj" ist abgeschlossen, Build Ziel(e) -- FEHLER.
+
+Fehler beim Buildvorgang.
+
+Verstrichene Zeit 00:00:00.01

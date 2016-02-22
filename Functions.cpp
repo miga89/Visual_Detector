@@ -45,10 +45,10 @@ void pxToCoordinates(double x_px, double y_px, double &x_cd, double &y_cd)
 	}
 	else
 	{
-		//x_cd = x_px * 3330 / 1570;
-		//y_cd = (FRAME_HEIGHT - y_px) * 1300 / 675 + 600 - 400 * 1300 / 675;
-		x_cd = x_px * 3300.0 / (line_delta_x);
-		y_cd = (FRAME_HEIGHT - y_px) * 1300.0 / (line_delta_y) + 570.0 - (FRAME_HEIGHT - horizontal_bottom_left.y) * 1300.0 / line_delta_y;
+		x_cd = x_px * 3330 / 1570;
+		y_cd = (FRAME_HEIGHT - y_px) * 1300 / 675 + 600 - 400 * 1300 / 675;
+		//x_cd = x_px * 3300.0 / (line_delta_x);
+		//y_cd = (FRAME_HEIGHT - y_px) * 1300.0 / (line_delta_y) + 570.0 - (FRAME_HEIGHT - horizontal_bottom_left.y) * 1300.0 / line_delta_y;
 
 	}
 }
@@ -62,10 +62,10 @@ void coordinatesToPx(double &x_px, double &y_px, double x_cd, double y_cd)
 	}
 	else
 	{
-		//x_px = x_cd * 1570.0 / 3300.0;
-		//y_px = (675.0 / 1300.0) * ((FRAME_HEIGHT * 1300.0 / 675.0) - y_cd + 600.0 - (400.0 * 1300.0 / 675));
-		x_px = x_cd * line_delta_x / 3300.0;
-		y_px = (line_delta_x / 1300.0) * ((FRAME_HEIGHT * 1300.0 / line_delta_y) - y_cd + 570.0 - ((FRAME_HEIGHT - horizontal_bottom_left.y) * 1300.0 / line_delta_y));
+		x_px = x_cd * 1570.0 / 3300.0;
+		y_px = (675.0 / 1300.0) * ((FRAME_HEIGHT * 1300.0 / 675.0) - y_cd + 600.0 - (400.0 * 1300.0 / 675));
+		//x_px = x_cd * line_delta_x / 3300.0;
+		//y_px = (line_delta_x / 1300.0) * ((FRAME_HEIGHT * 1300.0 / line_delta_y) - y_cd + 570.0 - ((FRAME_HEIGHT - horizontal_bottom_left.y) * 1300.0 / line_delta_y));
 
 	}
 }

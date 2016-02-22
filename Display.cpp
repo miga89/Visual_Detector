@@ -18,27 +18,22 @@ using namespace cv;
 // HSV colorspace used to filter colors
 //halogen licht an 
 
-//int H_MIN = 0;
-//int H_MAX = 26;
-//int S_MIN = 153;
-//int S_MAX = 256;
-//int V_MIN = 62;
-//int V_MAX = 256;
 
-//scheinwerfer an und halogen licht aus
-//int H_MIN = 0;
-//int H_MAX = 17;
-//int S_MIN = 232;
-//int S_MAX = 256;
-//int V_MIN = 97;
-//int V_MAX = 256;
-// mit dem autocolor bestimmt
-int H_MIN = 14;
+// mit dem autocolor bestimmt (beide lichter an)
+int H_MIN = 15;
 int H_MAX = 20;
-int S_MIN = 244;
+int S_MIN = 212;
 int S_MAX = 255;
-int V_MIN = 170;
+int V_MIN = 186;
 int V_MAX = 230;
+
+// mit dem autocolor bestimmt (deckenlicht aus)
+//int H_MIN = 13;
+//int H_MAX = 17;
+//int S_MIN = 255;
+//int S_MAX = 255;
+//int V_MIN = 149;
+//int V_MAX = 189;
 //names that will appear at the top of each window
 const std::string originalImage = "Original Image";
 const std::string hsvImage = "HSV Image";

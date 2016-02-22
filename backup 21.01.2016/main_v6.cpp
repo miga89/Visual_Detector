@@ -1,4 +1,4 @@
-/*
+
 // Michael Garstka
 // Ping Pong Ball tracker
 // Version of 21.12.15
@@ -256,4 +256,3 @@ int main(int argc, char* argv[])
 
 	return EXIT_SUCCESS;
 }
-*/

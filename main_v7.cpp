@@ -1,7 +1,7 @@
 
 // Michael Garstka
 // Ping Pong Ball tracker
-// Version of 21.12.15
+// Version of 15.02.16
 #include <sstream>
 #include <string>
 #include <iostream>
@@ -24,7 +24,7 @@
 #include "Ball.h"
 
 using namespace cv;
-
+/*
 #define KB_UP 72
 #define KB_DOWN 80
 #define KB_LEFT 75
@@ -68,7 +68,7 @@ void simple_keyboard_input()
       }
 
 }
-
+*/
 
 int main(int argc, char* argv[])
 {
@@ -137,6 +137,7 @@ int main(int argc, char* argv[])
 	data.close();
 	double timer1,timer2,cvt_dT,ir_dT,morph_dT,track_dT,rest_dT;
 	double kalman_cropp_dT = 0;
+	
 	while (1){
 
 		if (counter == 0)
@@ -177,7 +178,7 @@ int main(int argc, char* argv[])
 			// Case 3: No object detected in previous run AND object was detected within last 5 runs
 			else if (objectDetected == false && numAttempt <= 15)
 			{
-				searchSection = true; //true;
+				searchSection = true; 
 				mycase = 3;
 			}
 			// Case 4: No object detected in previous run AND no object was detected within last 5 runs
@@ -262,7 +263,7 @@ int main(int argc, char* argv[])
 			}
 			// after calculating the ball's px location, calculate coordinates
 			pxToCoordinates(ballpx.x, ballpx.y, ballcd.x, ballcd.y); //?
-			cv::circle(cameraFeed, ballpx, 5, CV_RGB(20, 150, 20), -1);
+			//cv::circle(cameraFeed, ballpx, 5, CV_RGB(20, 150, 20), -1);
 
 			numAttempt = 0; //set the notFoundCount to 0
 
@@ -288,7 +289,7 @@ int main(int argc, char* argv[])
 		timer1 = (double)cv::getTickCount();
 
 		
-		simple_keyboard_input();
+		//simple_keyboard_input();
 		// Add information to camera feed
 		//putText(cameraFeed, "+", Point(x_px_est, y_px_est), 1, 2, Scalar(0, 0, 255), 2);
 		line(cameraFeed, vertical_left_top, vertical_left_bottom, Scalar(255, 255, 255), 2, 8);
@@ -306,7 +307,7 @@ int main(int argc, char* argv[])
 		
 		putText(cameraFeed, "FPS=" + dblToString(measuredFPS), Point(0, 100), 1, 2, Scalar(255, 0, 0), 2);
 
-		//imshow(thresholdedImage, threshold);
+		imshow(thresholdedImage, threshold);
 		imshow(originalImage, cameraFeed);
 		imshow(hsvImage, HSV);
 
@@ -316,7 +317,8 @@ int main(int argc, char* argv[])
 		timer2 = (double)cv::getTickCount();
 		rest_dT = (timer2 - timer1) / cv::getTickFrequency();
 		data.open("data.txt", std::ios_base::app);
-		data << dblToString(ballcd.x) + " " + dblToString(ballcd.y) + " " + dblToString(t) + " " + intToString(mycase) + " " + dblToString(kalman_cropp_dT)+ dblToString(cvt_dT)+ dblToString(ir_dT)+ dblToString(morph_dT)+ dblToString(track_dT)+ dblToString(rest_dT)+"\n";
+		// data << dblToString(ballcd.x) + " " + dblToString(ballcd.y) + " " + dblToString(t) + " " + intToString(mycase) + " " + dblToString(kalman_cropp_dT)+" " + dblToString(cvt_dT)+ " " + dblToString(ir_dT)+ " " +dblToString(morph_dT)+" " + dblToString(track_dT)+" " + dblToString(rest_dT)+"\n";
+		data << dblToString(ballcd.x) + " " + dblToString(ballcd.y) + " " + dblToString(t) + " " + intToString(mycase) + " " + dblToString(kalman_cropp_dT)+" " + dblToString(cvt_dT)+ " " + dblToString(ir_dT)+ " " +dblToString(morph_dT)+" " + dblToString(track_dT)+" " + dblToString(rest_dT)+"\n";
 		data.close();
 
 		
