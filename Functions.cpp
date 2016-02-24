@@ -47,8 +47,8 @@ void pxToCoordinates(double x_px, double y_px, double &x_cd, double &y_cd)
 	{
 		//x_cd = x_px * 3330 / 1570;
 		//y_cd = (FRAME_HEIGHT - y_px) * 1300 / 675 + 600 - 400 * 1300 / 675;
-		x_cd = x_px * 3330 / 1475;
-		y_cd = (FRAME_HEIGHT - y_px) * 1300 / 590 + 570 - 440 * 1300 / 590;
+		x_cd = x_px * 3330.0 / 1505.0;
+		y_cd = (FRAME_HEIGHT - y_px) * 1300.0 / 595.0;
 		//x_cd = x_px * (3300.0 /line_delta_x);
 		//y_cd = (FRAME_HEIGHT - y_px) * 1300.0 / (line_delta_y);
 
@@ -66,8 +66,8 @@ void coordinatesToPx(double &x_px, double &y_px, double x_cd, double y_cd)
 	{
 		//x_px = x_cd * 1570.0 / 3300.0;
 		//y_px = (675.0 / 1300.0) * ((FRAME_HEIGHT * 1300.0 / 675.0) - y_cd + 600.0 - (400.0 * 1300.0 / 675));
-		x_px = x_cd * 1475.0 / 3300.0;
-		y_px = (590.0 / 1300.0) * ((FRAME_HEIGHT * 1300.0 / 590.0) - y_cd + 570.0 - (440 * 1300.0 / 590));
+		x_px = x_cd * 1505.0 / 3300.0;
+		y_px = (595.0 / 1300.0) * ((FRAME_HEIGHT * 1300.0 / 595.0) - y_cd);
 		//x_px = x_cd * (line_delta_x / 3300.0);
 		//y_px = FRAME_HEIGHT - (y_cd * (line_delta_y/1300.0));
 

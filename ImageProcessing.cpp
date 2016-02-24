@@ -86,6 +86,7 @@ void trackFilteredObject(double &x_px, double &y_px, Mat threshold, Mat &frame, 
 					y_px = moment.m01 / area;
 					//std::cout << area  << std::endl;
 
+
 					// set objectFound boolean to true
 					objectDetected = true;
 					dbg = 1;

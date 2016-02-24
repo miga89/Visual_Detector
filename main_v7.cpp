@@ -30,13 +30,13 @@ int main(int argc, char* argv[])
 {
 
 	// compute matrices for removal of distortion
-	Mat cameraMatrix = (Mat_<float>(3,3) << 1403.5, 950.8236, 0, 0, 1400.8, 586.2946,0,0,1);
-	Mat distCoeffs = (Mat_<float>(1,5) << -0.1977, 0.2083, 0, 0, -0.1146);
-	Mat a = Mat_<Point2f>;
-	a
-	Mat b;
-	undistortPoints(a,b,cameraMatrix,distCoeffs);
-	std::cout << b;
+	//Mat cameraMatrix = (Mat_<float>(3,3) << 1403.5, 950.8236, 0, 0, 1400.8, 586.2946,0,0,1);
+	//Mat distCoeffs = (Mat_<float>(1,5) << -0.1977, 0.2083, 0, 0, -0.1146);
+	//Mat a = Mat_<Point2f>;
+	//a
+	//Mat b;
+	//undistortPoints(a,b,cameraMatrix,distCoeffs);
+	//std::cout << b;
 	//Matrix to store each frame of the webcam feed, Mat is an opencv c++ n-dimensional array class
 	Mat cameraFeed, frame, croppedFrame;
 	//matrix storage for HSV image
@@ -175,7 +175,7 @@ int main(int argc, char* argv[])
 			ballcd.x = state.at<float>(0); //calculate the center of the predRect, which is equal to the state x,y
 			ballcd.y = state.at<float>(1);
 			coordinatesToPx(ballpx.x, ballpx.y, ballcd.x, ballcd.y);
-			std::cout << "xpx:" << ballpx.x << "; ypx:" << ballpx.y << "; xcd:" << ballcd.x << "; ycd:" << ballcd.y << "\n"; 
+			//std::cout << "xpx:" << ballpx.x << "; ypx:" << ballpx.y << "; xcd:" << ballcd.x << "; ycd:" << ballcd.y << "\n"; 
 			// draw circle into the resulting picture, centered around predicted location, and radius 2
 			cv::circle(cameraFeed, ballpx, 10, CV_RGB(0, 255, 0), 2);
 			cv::circle(cameraFeed, ballpx, 2, CV_RGB(0, 255, 0), -1);

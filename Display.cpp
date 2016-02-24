@@ -42,17 +42,17 @@ const std::string croppedImage = "Cropped Image";
 const std::string trackbarWindowName = "Trackbars";
 
 // create valus for the white horizontal and vertical lines displayed on screen that are used for camera calibration
-cv::Point_<double> vertical_left_top(120, 0);
-cv::Point_<double> vertical_left_bottom(120, FRAME_HEIGHT);
+cv::Point_<double> vertical_left_top(100, 0);
+cv::Point_<double> vertical_left_bottom(100, FRAME_HEIGHT);
 
-cv::Point_<double> vertical_right_top(FRAME_WIDTH - 325, 0);
-cv::Point_<double> vertical_right_bottom(FRAME_WIDTH - 325, FRAME_HEIGHT);
+cv::Point_<double> vertical_right_top(FRAME_WIDTH - 315, 0);
+cv::Point_<double> vertical_right_bottom(FRAME_WIDTH - 315, FRAME_HEIGHT);
 
 cv::Point_<double> horizontal_top_left(0, 170);
 cv::Point_<double> horizontal_top_right(FRAME_WIDTH, 170);
 
-cv::Point_<double> horizontal_bottom_left(0, FRAME_HEIGHT - 440);
-cv::Point_<double> horizontal_bottom_right(FRAME_WIDTH, FRAME_HEIGHT - 440);
+cv::Point_<double> horizontal_bottom_left(0, FRAME_HEIGHT - 435);
+cv::Point_<double> horizontal_bottom_right(FRAME_WIDTH, FRAME_HEIGHT - 435);
 double line_delta_x = abs(vertical_right_top.x - vertical_left_bottom.x);
 double line_delta_y = abs(horizontal_bottom_left.y - horizontal_top_left.y);
 
