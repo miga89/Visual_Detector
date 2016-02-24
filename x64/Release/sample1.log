@@ -1,16 +1,35 @@
-﻿Der Buildvorgang wurde am 18.12.2015 10:30:01 gestartet.
-     1>Projekt "E:\Eigene Dateien\Visual Studio 2012\Projects\sample1\sample1\sample1.vcxproj" auf Knoten "2", Build Ziel(e).
+﻿Der Buildvorgang wurde am 24.02.2016 16:27:00 gestartet.
+     1>Projekt "D:\Eigene Dateien\Visual Studio 2012\Projects\sample1\sample1\sample1.vcxproj" auf Knoten "2", Build Ziel(e).
      1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\x86_amd64\CL.exe /c /IC:\opencv\build\include /IC:\opencv\build\include\opencv /IC:\opencv\build\include\opencv2 /I"C:\Program Files\MATLAB\R2014a\extern\include" /Zi /nologo /W3 /WX- /sdl /O2 /Oi /GL /D WIN32 /D NDEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"x64\Release\\" /Fd"x64\Release\vc110.pdb" /Gd /TP /errorReport:prompt tutorial3_objectTracking.cpp
-         tutorial3_objectTracking.cpp
-     1>c:\opencv\build\include\opencv2\flann\logger.h(66): error C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\include\stdio.h(218): Siehe Deklaration von 'fopen'
-     1>tutorial3_objectTracking.cpp(40): warning C4244: 'Initialisierung': Konvertierung von 'double' in 'const int', möglicher Datenverlust
-     1>tutorial3_objectTracking.cpp(157): warning C4267: 'Initialisierung': Konvertierung von 'size_t' nach 'int', Datenverlust möglich
-     1>tutorial3_objectTracking.cpp(176): warning C4244: '=': Konvertierung von 'double' in 'int', möglicher Datenverlust
-     1>tutorial3_objectTracking.cpp(177): warning C4244: '=': Konvertierung von 'double' in 'int', möglicher Datenverlust
-     1>Die Erstellung des Projekts "E:\Eigene Dateien\Visual Studio 2012\Projects\sample1\sample1\sample1.vcxproj" ist abgeschlossen, Build Ziel(e) -- FEHLER.
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\x86_amd64\CL.exe /c /IC:\opencv\build\include /IC:\opencv\build\include\opencv /IC:\opencv\build\include\opencv2 /I"C:\Program Files\MATLAB\R2014a\extern\include" /Zi /nologo /W3 /WX- /sdl- /Od /Oi /GL /D WIN32 /D NDEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"x64\Release\\" /Fd"x64\Release\vc110.pdb" /Gd /TP /errorReport:prompt main_v7.cpp
+         main_v7.cpp
+     1>main_v7.cpp(171): warning C4244: '=': Konvertierung von 'double' in 'float', möglicher Datenverlust
+     1>main_v7.cpp(172): warning C4244: '=': Konvertierung von 'double' in 'float', möglicher Datenverlust
+     1>main_v7.cpp(173): warning C4244: '=': Konvertierung von 'double' in 'float', möglicher Datenverlust
+     1>main_v7.cpp(187): warning C4244: '=': Konvertierung von 'float' in 'int', möglicher Datenverlust
+     1>main_v7.cpp(188): warning C4244: '=': Konvertierung von 'float' in 'int', möglicher Datenverlust
+     1>main_v7.cpp(189): warning C4244: '=': Konvertierung von 'double' in 'int', möglicher Datenverlust
+     1>main_v7.cpp(190): warning C4244: '=': Konvertierung von 'double' in 'int', möglicher Datenverlust
+     1>main_v7.cpp(246): warning C4244: '=': Konvertierung von 'double' in 'float', möglicher Datenverlust
+     1>main_v7.cpp(247): warning C4244: '=': Konvertierung von 'double' in 'float', möglicher Datenverlust
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"D:\Eigene Dateien\Visual Studio 2012\Projects\sample1\x64\Release\sample1.exe" /INCREMENTAL:NO /NOLOGO /LIBPATH:C:\opencv\build\x64\vc11\lib /LIBPATH:C:\opencv\build\x64\vc12\lib /LIBPATH:C:\opencv\build\x64\vc12\lib opencv_calib3d2410.lib opencv_contrib2410.lib opencv_core2410.lib opencv_features2d2410.lib opencv_flann2410.lib opencv_gpu2410.lib opencv_highgui2410.lib opencv_imgproc2410.lib opencv_legacy2410.lib opencv_ml2410.lib opencv_nonfree2410.lib opencv_objdetect2410.lib opencv_ocl2410.lib opencv_photo2410.lib opencv_stitching2410.lib opencv_superres2410.lib opencv_ts2410.lib opencv_video2410.lib opencv_videostab2410.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:\Eigene Dateien\Visual Studio 2012\Projects\sample1\x64\Release\sample1.pdb" /SUBSYSTEM:CONSOLE /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:\Eigene Dateien\Visual Studio 2012\Projects\sample1\x64\Release\sample1.lib" /MACHINE:X64 x64\Release\Converter.obj
+         x64\Release\Display.obj
+         x64\Release\Functions.obj
+         x64\Release\ImageAquisition.obj
+         x64\Release\ImageProcessing.obj
+         x64\Release\KalmanFilter.obj
+         x64\Release\main_v5_working.obj
+         x64\Release\main_v6.obj
+         x64\Release\main_v7.obj
+         x64\Release\tutorial3_objectTracking.obj
+         x64\Release\tutorial4_predict.obj
+         x64\Release\tutorial5_newKalman_backup.obj
+         Code wird generiert.
+         Codegenerierung ist abgeschlossen.
+         sample1.vcxproj -> D:\Eigene Dateien\Visual Studio 2012\Projects\sample1\x64\Release\sample1.exe
+     1>Die Erstellung des Projekts "D:\Eigene Dateien\Visual Studio 2012\Projects\sample1\sample1\sample1.vcxproj" ist abgeschlossen, Build Ziel(e).
 
-Fehler beim Buildvorgang.
+Build erfolgreich.
 
-Verstrichene Zeit 00:00:00.56
+Verstrichene Zeit 00:00:02.02

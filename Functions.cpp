@@ -3,7 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <opencv\highgui.h>
-#include <opencv\cv.h>
+#include <opencv2/opencv.hpp>
 #include <ctime>
 #include <opencv2/video/video.hpp>
 #include <opencv2/imgproc/imgproc.hpp>

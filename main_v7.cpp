@@ -2,12 +2,15 @@
 // Michael Garstka
 // Ping Pong Ball tracker
 // Version of 15.02.16
+#define _CRT_SECURE_NO_DEPRECATE
+
 #include <sstream>
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <stdio.h>
 #include <opencv\highgui.h>
-#include <opencv\cv.h>
+#include <opencv2/opencv.hpp>
 #include <ctime>
 #include <opencv2/video/video.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -50,7 +53,7 @@ int main(int argc, char* argv[])
 	int measSize = 4; // [z_x,z_y,z_w,z_h]
 	int contrSize = 1;
 	cv::Mat meas(measSize, 1, type);    // [z_x,z_y,z_w,z_h]
-	cv::Rect predRect(0, 0, 250, 250);
+	cv::Rect predRect(0, 0, 200, 200);
 	cv::Point center(0, 0);
 	cv::Mat state(stateSize, 1, type);  // [x,y,v_x,v_y,w,h]
 	state.at<float>(0) = meas.at<float>(0);
@@ -69,7 +72,7 @@ int main(int argc, char* argv[])
 	int dbg = 1;
 
 	//create slider bars for HSV filtering
-	createTrackbars();
+	//createTrackbars();
 	//video capture object to acquire webcam feed is created with object name "capture"
 	cv::VideoCapture capture = createVideoCapture(FRAME_WIDTH, FRAME_HEIGHT);
 
@@ -242,8 +245,8 @@ int main(int argc, char* argv[])
 
 			meas.at<float>(0) = ballcd.x; //update the measurement vector with the x value
 			meas.at<float>(1) = ballcd.y; //update the measurement vector with y value
-			meas.at<float>(2) = 250; //update the width  measurement
-			meas.at<float>(3) = 250; // update the height measurement
+			meas.at<float>(2) = 200; //update the width  measurement
+			meas.at<float>(3) = 200; // update the height measurement
 			correct = kf.correct(meas); // Kalman Correction
 			putText(cameraFeed, "Object Found at: x=" + dblToString(ballcd.x) + "mm (" + dblToString(ballpx.x) + "px) , y=" + dblToString(ballcd.y) + "mm (" + dblToString(ballpx.y) + "px)", Point(0, 50), 2, 1, Scalar(255, 0, 0), 2);
 			//draw object location on screen, input centroid position and current camera frame
@@ -278,19 +281,19 @@ int main(int argc, char* argv[])
 		
 		putText(cameraFeed, "FPS=" + dblToString(measuredFPS), Point(0, 100), 1, 2, Scalar(255, 0, 0), 2);
 
-		imshow(thresholdedImage, threshold);
+		//imshow(thresholdedImage, threshold);
 		imshow(originalImage, cameraFeed);
-		imshow(hsvImage, HSV);
+		//imshow(hsvImage, HSV);
 
 		// save data to text file
 		timestop = (double)cv::getTickCount();
 		t = (timestop - timestart) / cv::getTickFrequency();
 		timer2 = (double)cv::getTickCount();
 		rest_dT = (timer2 - timer1) / cv::getTickFrequency();
-		data.open("data.txt", std::ios_base::app);
+		//data.open("data.txt", std::ios_base::app);
 		// data << dblToString(ballcd.x) + " " + dblToString(ballcd.y) + " " + dblToString(t) + " " + intToString(mycase) + " " + dblToString(kalman_cropp_dT)+" " + dblToString(cvt_dT)+ " " + dblToString(ir_dT)+ " " +dblToString(morph_dT)+" " + dblToString(track_dT)+" " + dblToString(rest_dT)+"\n";
-		data << dblToString(ballcd.x) + " " + dblToString(ballcd.y) + " " + dblToString(t) + " " + intToString(mycase) + " " + dblToString(kalman_cropp_dT)+" " + dblToString(cvt_dT)+ " " + dblToString(ir_dT)+ " " +dblToString(morph_dT)+" " + dblToString(track_dT)+" " + dblToString(rest_dT)+"\n";
-		data.close();
+		//data << dblToString(ballcd.x) + " " + dblToString(ballcd.y) + " " + dblToString(t) + " " + intToString(mycase) + " " + dblToString(kalman_cropp_dT)+" " + dblToString(cvt_dT)+ " " + dblToString(ir_dT)+ " " +dblToString(morph_dT)+" " + dblToString(track_dT)+" " + dblToString(rest_dT)+"\n";
+		//data.close();
 
 		
 		//delay 30ms so that screen can refresh.
