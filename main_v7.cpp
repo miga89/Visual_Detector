@@ -32,14 +32,7 @@ using namespace cv;
 int main(int argc, char* argv[])
 {
 
-	// compute matrices for removal of distortion
-	//Mat cameraMatrix = (Mat_<float>(3,3) << 1403.5, 950.8236, 0, 0, 1400.8, 586.2946,0,0,1);
-	//Mat distCoeffs = (Mat_<float>(1,5) << -0.1977, 0.2083, 0, 0, -0.1146);
-	//Mat a = Mat_<Point2f>;
-	//a
-	//Mat b;
-	//undistortPoints(a,b,cameraMatrix,distCoeffs);
-	//std::cout << b;
+	
 	//Matrix to store each frame of the webcam feed, Mat is an opencv c++ n-dimensional array class
 	Mat cameraFeed, frame, croppedFrame;
 	//matrix storage for HSV image
@@ -49,25 +42,26 @@ int main(int argc, char* argv[])
 
 	// create kalman Filter object and state and measurement vectors
 	unsigned int type = CV_32F;
-	int stateSize = 6; // [x,y,v_x,v_y,w,h]
-	int measSize = 4; // [z_x,z_y,z_w,z_h]
+	int stateSize = 4; // [x,y,v_x,v_y]
+	int measSize = 2; // [z_x,z_y]
 	int contrSize = 1;
 	cv::Mat meas(measSize, 1, type);    // [z_x,z_y,z_w,z_h]
-	cv::Rect predRect(0, 0, 200, 200);
+	cv::Rect predRect(0, 0, 250, 250);
 	cv::Point center(0, 0);
 	cv::Mat state(stateSize, 1, type);  // [x,y,v_x,v_y,w,h]
-	state.at<float>(0) = meas.at<float>(0);
-	state.at<float>(1) = meas.at<float>(1);
+	state.at<float>(0) = 0;
+	state.at<float>(1) = 0;
 	state.at<float>(2) = 0;
 	state.at<float>(3) = 0;
-	state.at<float>(4) = meas.at<float>(2);
-	state.at<float>(5) = meas.at<float>(3);
 	cv::Mat control(contrSize, 1, type);
 	control.at<float>(0) = 0;
 	cv::KalmanFilter kf = createKalmanFilter(stateSize, measSize, contrSize, type);
 	cv::Mat correct = meas;
 	Point_<double> ballpx(0, 0); //create px-location of ball
 	Point_<double> ballcd(0, 0); //create coordinate-location of ball
+	Point_<double> ballcd_cor(0, 0); //create Kalman corrected coordinate-location of ball
+	Point_<double> ballpx_cor(0, 0); //create Kalman corrected pixel-location of ball
+
 	// debugging variables
 	int dbg = 1;
 
@@ -99,12 +93,14 @@ int main(int argc, char* argv[])
 	double t =0;
 	// create text file to store data and delete previous data
 	std::ofstream data;
+	std::ofstream pdata;
+
 	data.open("data.txt");
-	data << "x y t case x_pre y_pre x_cor y_cor\n";
+	data << "case t x y  x_cor y_cor\n vx_cor vy_cor";
 	data.close();
-	double timer1,timer2,cvt_dT,ir_dT,morph_dT,track_dT,rest_dT;
-	double kalman_cropp_dT = 0;
-	
+	pdata.open("predict.txt");
+	pdata << "case x_pre y_pre vx_pre vy_pre\n";
+	pdata.close();
 	while (1){
 
 		if (counter == 0)
@@ -130,9 +126,7 @@ int main(int argc, char* argv[])
 		// Case 1: Initial loop run --> search whole picture
 		if (initial == true)
 		{
-			// delete later
-			//std::cout <<   "deltax:" << line_delta_x << "\n";          
-			//std::cout <<   "deltay:" << line_delta_y << "\n";          
+
 
 			searchSection = false;
 			initial = false;
@@ -143,7 +137,7 @@ int main(int argc, char* argv[])
 			// Case 2: Object Detected in previous run --> search only around next estimated position
 			if (objectDetected == true)
 			{
-				searchSection = true; //true
+				searchSection = true; 
 				mycase = 2;
 			}
 			// Case 3: No object detected in previous run AND object was detected within last 5 runs
@@ -166,63 +160,55 @@ int main(int argc, char* argv[])
 
 		if (searchSection == true)
 		{
-			timer1 = (double)cv::getTickCount();
 			// update transition matrix A
 			kf.transitionMatrix.at<float>(2) = dT;
-			kf.transitionMatrix.at<float>(9) = dT;
+			kf.transitionMatrix.at<float>(7) = dT;
 			kf.controlMatrix.at<float>(3) = -dT;
 			// predict next state
 			state = kalmanPredict(kf,control); //slightly modified
+
+			// save predicted states to file to evaluate kalman filter
+			pdata.open("predict.txt", std::ios_base::app);
+			pdata <<  intToString(mycase) + " " +  dblToString(state.at<float>(0)) + " " +  dblToString(state.at<float>(1))+ " " +  dblToString(state.at<float>(2))+ " " +  dblToString(state.at<float>(3))+ "\n";
+			pdata.close();
 			//state = kf.predict();
+
+
 			//calculate center point
-			ballcd.x = state.at<float>(0); //calculate the center of the predRect, which is equal to the state x,y
+			ballcd.x = state.at<float>(0); 
 			ballcd.y = state.at<float>(1);
 			coordinatesToPx(ballpx.x, ballpx.y, ballcd.x, ballcd.y);
 			//std::cout << "xpx:" << ballpx.x << "; ypx:" << ballpx.y << "; xcd:" << ballcd.x << "; ycd:" << ballcd.y << "\n"; 
 			// draw circle into the resulting picture, centered around predicted location, and radius 2
 			cv::circle(cameraFeed, ballpx, 10, CV_RGB(0, 255, 0), 2);
-			cv::circle(cameraFeed, ballpx, 2, CV_RGB(0, 255, 0), -1);
+			cv::circle(cameraFeed, ballpx, 3, CV_RGB(0, 255, 0), -1);
 
 			// create and intialize prediction rectangle
-			predRect.width = state.at<float>(4); //specify width of prediction rectangle by the predicted width
-			predRect.height = state.at<float>(5); // specify height of prediction rectangle
-			predRect.x = ballpx.x - 250 / 2; // calculate the top left corner x 
-			predRect.y = ballpx.y - 250 / 2; // calculate the top left corner y
+			predRect.x = ballpx.x - (predRect.width / 2); // calculate the top left corner x 
+			predRect.y = ballpx.y - (predRect.height / 2); // calculate the top left corner y
 			// adjust predRect to make sure it is within picture
 			adjustPredRect(predRect);
 			// draw rectangle into the resulting picture  with the information specified in predRect
-			cv::rectangle(cameraFeed, predRect, CV_RGB(255, 0, 0), 2);
+			cv::rectangle(cameraFeed, predRect, CV_RGB(0, 255, 0), 2);
 			// crop the image
 			cameraFeed(predRect).copyTo(croppedFrame);
 			frame = croppedFrame;
-			timer2 = (double)cv::getTickCount();
-			kalman_cropp_dT = (timer2 - timer1) / cv::getTickFrequency(); 
+
 
 		}
 
 		// perform image operations on image
 		
-		timer1 = (double)cv::getTickCount();
 		cvtColor(frame, HSV, COLOR_BGR2HSV);
-		timer2 = (double)cv::getTickCount();
-		cvt_dT = (timer2 - timer1) / cv::getTickFrequency();
-		timer1 = (double)cv::getTickCount();
+
 
 		inRange(HSV, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), threshold);
-		timer2 = (double)cv::getTickCount();
-		ir_dT = (timer2 - timer1) / cv::getTickFrequency();
-		timer1 = (double)cv::getTickCount();
 		morphOps(threshold);
-		timer2 = (double)cv::getTickCount();
-		morph_dT = (timer2 - timer1) / cv::getTickFrequency();
 		//imwrite( "feed.jpg", cameraFeed );
 		//imwrite( "cvt.jpg", HSV );
 		//imwrite( "thresh.jpg", threshold );
 		// try to track the object in the cropped threshold image and return pixel coordinates of object, otherwise return -1,-1
-		timer1 = (double)cv::getTickCount();
 		trackFilteredObject(ballpx.x, ballpx.y, threshold, frame, objectDetected, dbg);
-		timer2 = (double)cv::getTickCount();
-		track_dT = (timer2 - timer1) / cv::getTickFrequency();
 		if (objectDetected == true)
 		{
 			if (searchSection == true)
@@ -235,22 +221,28 @@ int main(int argc, char* argv[])
 				}
 			}
 			// after calculating the ball's px location, calculate coordinates
-			pxToCoordinates(ballpx.x, ballpx.y, ballcd.x, ballcd.y); //?
-			cv::circle(cameraFeed, ballpx, 10, CV_RGB(255, 0, 0), 1);
-			cv::circle(cameraFeed, ballpx, 2, CV_RGB(255, 0, 0), -1);
+			pxToCoordinates(ballpx.x, ballpx.y, ballcd.x, ballcd.y); 
+			// draw information to screen
+			cv::circle(cameraFeed, ballpx, 3, CV_RGB(0, 0, 255), -1);
+			putText(cameraFeed, "Object Found at: x=" + dblToString(ballcd.x) + "mm (" + dblToString(ballpx.x) + "px) , y=" + dblToString(ballcd.y) + "mm (" + dblToString(ballpx.y) + "px)", Point(0, 50), 2, 1, Scalar(255, 0, 0), 2);
 
-			numAttempt = 0; //set the notFoundCount to 0
+			numAttempt = 0; //set numAttempt to 0
 
 
 
 			meas.at<float>(0) = ballcd.x; //update the measurement vector with the x value
 			meas.at<float>(1) = ballcd.y; //update the measurement vector with y value
-			meas.at<float>(2) = 200; //update the width  measurement
-			meas.at<float>(3) = 200; // update the height measurement
+
 			correct = kf.correct(meas); // Kalman Correction
-			putText(cameraFeed, "Object Found at: x=" + dblToString(ballcd.x) + "mm (" + dblToString(ballpx.x) + "px) , y=" + dblToString(ballcd.y) + "mm (" + dblToString(ballpx.y) + "px)", Point(0, 50), 2, 1, Scalar(255, 0, 0), 2);
+			ballcd_cor.x = correct.at<float>(0); 
+			ballcd_cor.y = correct.at<float>(1);
+			coordinatesToPx(ballpx_cor.x, ballpx_cor.y, ballcd_cor.x, ballcd_cor.y);
+			cv::circle(cameraFeed, ballpx_cor, 3, CV_RGB(255, 0,0 ), -1);
+
+
 			//draw object location on screen, input centroid position and current camera frame
 			//drawObject(x_px, y_px, cameraFeed);
+
 		}
 		else
 		{
@@ -260,10 +252,7 @@ int main(int argc, char* argv[])
 
 		}
 
-		timer1 = (double)cv::getTickCount();
 
-		
-		//simple_keyboard_input();
 		// Add information to camera feed
 		//putText(cameraFeed, "+", Point(x_px_est, y_px_est), 1, 2, Scalar(0, 0, 255), 2);
 		line(cameraFeed, vertical_left_top, vertical_left_bottom, Scalar(255, 255, 255), 2, 8);
@@ -288,12 +277,10 @@ int main(int argc, char* argv[])
 		// save data to text file
 		timestop = (double)cv::getTickCount();
 		t = (timestop - timestart) / cv::getTickFrequency();
-		timer2 = (double)cv::getTickCount();
-		rest_dT = (timer2 - timer1) / cv::getTickFrequency();
-		//data.open("data.txt", std::ios_base::app);
-		// data << dblToString(ballcd.x) + " " + dblToString(ballcd.y) + " " + dblToString(t) + " " + intToString(mycase) + " " + dblToString(kalman_cropp_dT)+" " + dblToString(cvt_dT)+ " " + dblToString(ir_dT)+ " " +dblToString(morph_dT)+" " + dblToString(track_dT)+" " + dblToString(rest_dT)+"\n";
-		//data << dblToString(ballcd.x) + " " + dblToString(ballcd.y) + " " + dblToString(t) + " " + intToString(mycase) + " " + dblToString(kalman_cropp_dT)+" " + dblToString(cvt_dT)+ " " + dblToString(ir_dT)+ " " +dblToString(morph_dT)+" " + dblToString(track_dT)+" " + dblToString(rest_dT)+"\n";
-		//data.close();
+
+		data.open("data.txt", std::ios_base::app);
+		 data <<  intToString(mycase) + " " + dblToString(t) + " " + dblToString(ballcd.x) + " " + dblToString(ballcd.y) + " " + dblToString(ballcd_cor.x) + " " + dblToString(ballcd_cor.y) + + " " + dblToString(correct.at<float>(2)) + " " + dblToString(correct.at<float>(3)) + "\n";
+		data.close();
 
 		
 		//delay 30ms so that screen can refresh.
