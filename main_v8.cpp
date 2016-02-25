@@ -1,4 +1,4 @@
-
+/*
 // Michael Garstka
 // Ping Pong Ball tracker
 // Version of 15.02.16
@@ -39,31 +39,23 @@ int main(int argc, char* argv[])
 	//matrix storage for binary threshold image
 	Mat threshold;
 
-	// create kalman Filter object and state and measurement vectors
-	unsigned int type = CV_32F;
-	int stateSize = 4; // [x,y,v_x,v_y]
-	int measSize = 2; // [z_x,z_y]
-	int contrSize = 1;
-	cv::Mat meas(measSize, 1, type);    // [z_x,z_y,z_w,z_h]
-	cv::Rect predRect(0, 0, 250, 250);
-	cv::Point center(0, 0);
-	cv::Mat state(stateSize, 1, type);  // [x,y,v_x,v_y,w,h]
-	state.at<float>(0) = 0;
-	state.at<float>(1) = 0;
-	state.at<float>(2) = 0;
-	state.at<float>(3) = 0;
-	cv::Mat control(contrSize, 1, type);
-	control.at<float>(0) = 0;
-	cv::KalmanFilter kf = createKalmanFilter(stateSize, measSize, contrSize, type);
-	cv::Mat correct = meas;
+	// create state history container
+	double state_x = 0;
+	double state_y = 0;
+	double state_vx = 0;
+	double state_vy = 0;
+	double x_prev = 0;
+	double y_prev = 0;
 	Point_<double> ballpx(0, 0); //create px-location of ball
 	Point_<double> ballcd(0, 0); //create coordinate-location of ball
 	Point_<double> ballcd_cor(0, 0); //create Kalman corrected coordinate-location of ball
 	Point_<double> ballpx_cor(0, 0); //create Kalman corrected pixel-location of ball
+	cv::Rect predRect(0, 0, 250, 250);
 
 	// debugging variables
 	int dbg = 1;
-	cv::Mat dspPrediction(stateSize,1,type);
+	//cv::Mat dspPrediction = state; // variable used to print predictions on screen
+
 	//create slider bars for HSV filtering
 	//createTrackbars();
 	//video capture object to acquire webcam feed is created with object name "capture"
@@ -92,18 +84,20 @@ int main(int argc, char* argv[])
 	// create text file to store data and delete previous data
 	std::ofstream data;
 	std::ofstream pdata;
-
+	int data_counter = 0;
 	data.open("data.txt");
-	data << "case t x y  x_cor y_cor\n vx_cor vy_cor";
+	data << "RECONSTRUCT CALCULATIONS \n";
 	data.close();
-	pdata.open("predict.txt");
-	pdata << "case x_pre y_pre vx_pre vy_pre\n";
-	pdata.close();
+		data.open("data.txt", std::ios_base::app);
+		 data <<  intToString(mycase) + " " + dblToString(t) + " " + dblToString(ballcd.x) + " " + dblToString(ballcd.y) + "\n";
+		data.close();
 
 		// Setup output video
 		int fcc = CV_FOURCC('M','P','4','2');
 		cv::VideoWriter output_cap("D:/CamCapture.avi",fcc,20, cvSize(  1920, 1200 ) );
 	
+	// test function
+
 
 	// MAIN LOOP
 	while (1){
@@ -165,23 +159,26 @@ int main(int argc, char* argv[])
 
 		if (searchSection == true)
 		{
-			// update transition matrix A
-			kf.transitionMatrix.at<float>(2) = dT;
-			kf.transitionMatrix.at<float>(7) = dT;
-			kf.controlMatrix.at<float>(3) = -dT;
+
 			// predict next state
-			state = kalmanPredict(kf,control); //slightly modified
-			dspPrediction = state; // variable used to print predictions on screen
+			makePrediction(dT,state_x,state_y,state_vx,state_vy);
+			data.open("data.txt", std::ios_base::app);
+			 data <<  "makePrediction():\n";
+			 data <<  "dT: " + dblToString(dT) + " state_x:" + dblToString(state_x) + " state_y:" + dblToString(state_y)+ " state_vx:" + dblToString(state_vx)+ " state_vy:" + dblToString(state_vy) + " \n \n";
+			data.close();
+			putText(cameraFeed, "xp=" + dblToString(state_x) + " yp=" + dblToString(state_y) + " vxp=" + dblToString(state_vx) + " vyp=" + dblToString(state_vy), Point(0, 200), 1, 2, Scalar(255, 0, 0), 2);
+
+			//dspPrediction = state; // variable used to print predictions on screen
 			// save predicted states to file to evaluate kalman filter
-			pdata.open("predict.txt", std::ios_base::app);
-			pdata <<  intToString(mycase) + " " +  dblToString(state.at<float>(0)) + " " +  dblToString(state.at<float>(1))+ " " +  dblToString(state.at<float>(2))+ " " +  dblToString(state.at<float>(3))+ "\n";
-			pdata.close();
+			//pdata.open("predict.txt", std::ios_base::app);
+			//pdata <<  intToString(mycase) + " " +  dblToString(state.at<float>(0)) + " " +  dblToString(state.at<float>(1))+ " " +  dblToString(state.at<float>(2))+ " " +  dblToString(state.at<float>(3))+ "\n";
+			//pdata.close();
 			//state = kf.predict();
 
 
 			//calculate center point
-			ballcd.x = state.at<float>(0); 
-			ballcd.y = state.at<float>(1);
+			ballcd.x = state_x; 
+			ballcd.y = state_y;
 			coordinatesToPx(ballpx.x, ballpx.y, ballcd.x, ballcd.y);
 			//std::cout << "xpx:" << ballpx.x << "; ypx:" << ballpx.y << "; xcd:" << ballcd.x << "; ycd:" << ballcd.y << "\n"; 
 			// draw circle into the resulting picture, centered around predicted location, and radius 2
@@ -232,17 +229,23 @@ int main(int argc, char* argv[])
 			putText(cameraFeed, "Object Found at: x=" + dblToString(ballcd.x) + "mm (" + dblToString(ballpx.x) + "px) , y=" + dblToString(ballcd.y) + "mm (" + dblToString(ballpx.y) + "px)", Point(0, 50), 2, 1, Scalar(255, 0, 0), 2);
 
 			numAttempt = 0; //set numAttempt to 0
+			
+			
+	
+			// calculate new state
+			x_prev = state_x;
+			y_prev = state_y;
+			state_vx = (ballcd.x - x_prev)/dT;
+			state_vy = (ballcd.y - y_prev)/dT;
+			state_x = ballcd.x;
+			state_y = ballcd.y;
 
-
-
-			meas.at<float>(0) = ballcd.x; //update the measurement vector with the x value
-			meas.at<float>(1) = ballcd.y; //update the measurement vector with y value
-
-			correct = kf.correct(meas); // Kalman Correction
-			ballcd_cor.x = correct.at<float>(0); 
-			ballcd_cor.y = correct.at<float>(1);
-			coordinatesToPx(ballpx_cor.x, ballpx_cor.y, ballcd_cor.x, ballcd_cor.y);
-			cv::circle(cameraFeed, ballpx_cor, 3, CV_RGB(255, 0,0 ), -1);
+			data.open("data.txt", std::ios_base::app);
+			data <<  "Object detected!: \n";
+			data <<  "ballcd.x:" + dblToString(ballcd.x) + " ballcd.y:" + dblToString(ballcd.y)+ "\n";
+			data <<  "x_prev:" + dblToString(x_prev) + " y_prev:" + dblToString(y_prev) + " dT:" + dblToString(dT)+ "\n";
+			data <<  "state_x:" + dblToString(state_x) + " state_y:" + dblToString(state_y)  + " state_vx:" + dblToString(state_vx) + " state_vy:" + dblToString(state_vy)+ "\n \n";
+			data.close();
 
 
 			//draw object location on screen, input centroid position and current camera frame
@@ -253,8 +256,12 @@ int main(int argc, char* argv[])
 		{
 			numAttempt++;
 			putText(cameraFeed, "No Object Found!", Point(0, 50), 1, 2, Scalar(255, 0, 0), 2);
-			correct = kf.statePost; // save Kalman Correction=Kalman Prediction
-
+					data.open("data.txt", std::ios_base::app);
+			data <<  "No Object detected!: \n";
+			data <<  "ballcd.x:" + dblToString(ballcd.x) + " ballcd.y:" + dblToString(ballcd.y)+ "\n";
+			data <<  "x_prev:" + dblToString(x_prev) + " y_prev:" + dblToString(y_prev) + " dT:" + dblToString(dT)+ "\n";
+			data <<  "state_x:" + dblToString(state_x) + " state_y:" + dblToString(state_y)  + " state_vx:" + dblToString(state_vx) + " state_vy:" + dblToString(state_vy)+ "\n \n";
+			data.close();
 		}
 
 
@@ -264,9 +271,7 @@ int main(int argc, char* argv[])
 		line(cameraFeed, vertical_right_top, vertical_right_bottom, Scalar(255, 255, 255), 2, 8);
 		line(cameraFeed, horizontal_top_left, horizontal_top_right, Scalar(255, 255, 255), 2, 8);
 		line(cameraFeed,horizontal_bottom_left, horizontal_bottom_right, Scalar(255, 255, 255), 2, 8);
-			putText(cameraFeed, "xp=" + dblToString(dspPrediction.at<float>(0)) + " yp=" + dblToString(dspPrediction.at<float>(0)) + " vxp=" + dblToString(dspPrediction.at<float>(2)) + " vyp=" + dblToString(dspPrediction.at<float>(3)), Point(0, 200), 1, 2, Scalar(255, 0, 0), 2);
-			putText(cameraFeed, "xc=" + dblToString(correct.at<float>(0)) + " yc=" + dblToString(correct.at<float>(0)) + " vxc=" + dblToString(correct.at<float>(2)) + " vyc=" + dblToString(correct.at<float>(3)), Point(0, 300), 1, 2, Scalar(255, 0, 0), 2);
-			putText(cameraFeed, "case=" + intToString(mycase) , Point(0, 350), 1, 2, Scalar(255, 0, 0), 2);
+			putText(cameraFeed, "case=" + intToString(mycase)+ " dT= " + dblToString(dT) , Point(0, 350), 1, 2, Scalar(255, 0, 0), 2);
 		
 		if (counter == 10){
 			stop = (double)cv::getTickCount();
@@ -285,13 +290,11 @@ int main(int argc, char* argv[])
 		timestop = (double)cv::getTickCount();
 		t = (timestop - timestart) / cv::getTickFrequency();
 
-		data.open("data.txt", std::ios_base::app);
-		 data <<  intToString(mycase) + " " + dblToString(t) + " " + dblToString(ballcd.x) + " " + dblToString(ballcd.y) + " " + dblToString(ballcd_cor.x) + " " + dblToString(ballcd_cor.y) + + " " + dblToString(correct.at<float>(2)) + " " + dblToString(correct.at<float>(3)) + "\n";
-		data.close();
+	
 
 
-			output_cap.write(cameraFeed);
-			if (t>20) break;
+		output_cap.write(cameraFeed);
+		if (t>20) break;
 	
 		
 		//delay 30ms so that screen can refresh.
@@ -300,10 +303,12 @@ int main(int argc, char* argv[])
 	}
 
 
+	if (recordVideo == true){
 		capture.release();
 		output_cap.release();
-
+	}
 
 
 	return EXIT_SUCCESS;
 }
+*/

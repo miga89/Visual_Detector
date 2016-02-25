@@ -8,7 +8,7 @@
 #include <opencv2/video/video.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/core/core.hpp>
-
+#include <cmath>
 #include "ImageAquisition.h"
 #include "DataOutput.h"
 #include "Converter.h"
@@ -90,4 +90,31 @@ void adjustPredRect(cv::Rect &predRect)
 	predRect.x = x;
 	predRect.y = y;
 
+}
+
+void makePrediction(double dT, double &state_x, double &state_y, double &state_vx,double & state_vy)
+{
+	cv::Mat_<double> states(4,1); //last three states
+	
+	double x_prev = state_x/1000;
+	double y_prev = state_y/1000;
+	double vx_prev = state_vx/1000;
+	double vy_prev = state_vy/1000;
+	double v_abs = sqrt(pow(vx_prev,2) + pow(vy_prev,2));
+
+	double Km = 0.12;
+	double g = 9.81;
+	// calculate initial velocities
+
+	// calculate predicted position
+	double x_next = x_prev + dT * vx_prev;
+	double y_next = y_prev + dT * vy_prev;
+	double vx_next = vx_prev + dT * -Km * v_abs * vx_prev;
+	double vy_next = vy_prev + dT *( -Km * v_abs * vy_prev);
+
+
+	state_x = x_next * 1000;
+	state_y = y_next * 1000;
+	state_vx = vx_next * 1000;
+	state_vy = vy_next * 1000;
 }

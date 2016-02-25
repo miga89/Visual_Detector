@@ -16,4 +16,7 @@ void coordinatesToPx(double &x_px, double &y_px, double x_cd, double y_cd);
 
 void adjustPredRect(cv::Rect &predRect);
 
+void makePrediction(double dT, double &state_x, double &state_y, double &state_vx,double & state_vy);
+
+
 #endif
