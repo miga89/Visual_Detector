@@ -28,7 +28,7 @@
 
 using namespace cv;
 
-
+bool recordVideo = true;
 int main(int argc, char* argv[])
 {
 
@@ -69,7 +69,7 @@ int main(int argc, char* argv[])
 	//createTrackbars();
 	//video capture object to acquire webcam feed is created with object name "capture"
 	cv::VideoCapture capture = createVideoCapture(FRAME_WIDTH, FRAME_HEIGHT);
-
+	cv::VideoWriter output_cap;
 	//create windows to display picture and results
 	createWindows();
 
@@ -101,6 +101,14 @@ int main(int argc, char* argv[])
 	pdata.open("predict.txt");
 	pdata << "case x_pre y_pre vx_pre vy_pre\n";
 	pdata.close();
+
+	if (recordVideo == true){
+		// Setup output video
+		int fcc = CV_FOURCC('M','P','4','2');
+		cv::VideoWriter output_cap("D:/CamCapture.avi",fcc,20, cvSize(  1920, 1200 ) );
+	}
+
+	// MAIN LOOP
 	while (1){
 
 		if (counter == 0)
@@ -272,7 +280,7 @@ int main(int argc, char* argv[])
 
 		//imshow(thresholdedImage, threshold);
 		imshow(originalImage, cameraFeed);
-		//imshow(hsvImage, HSV);
+		imshow(hsvImage, HSV);
 
 		// save data to text file
 		timestop = (double)cv::getTickCount();
@@ -282,6 +290,10 @@ int main(int argc, char* argv[])
 		 data <<  intToString(mycase) + " " + dblToString(t) + " " + dblToString(ballcd.x) + " " + dblToString(ballcd.y) + " " + dblToString(ballcd_cor.x) + " " + dblToString(ballcd_cor.y) + + " " + dblToString(correct.at<float>(2)) + " " + dblToString(correct.at<float>(3)) + "\n";
 		data.close();
 
+		if (recordVideo == true){
+			output_cap.write(cameraFeed);
+			if (t>30) break;
+		}
 		
 		//delay 30ms so that screen can refresh.
 		//image will not appear without this waitKey() command
@@ -289,8 +301,10 @@ int main(int argc, char* argv[])
 	}
 
 
-
-
+	if (recordVideo == true){
+		capture.release();
+		output_cap.release();
+	}
 
 
 	return EXIT_SUCCESS;
