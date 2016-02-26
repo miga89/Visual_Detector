@@ -34,6 +34,8 @@ void morphOps(Mat &thresh){
 
 	//erode(inputArray source, outputArray destination,inputArray kernel) Gegenteil von dilate
 	erode(thresh, thresh, erodeElement);
+		//erode(thresh, thresh, erodeElement);
+
 				//imwrite( "erode1.jpg", thresh );
 
 	//erode(thresh, thresh, erodeElement);
@@ -41,6 +43,8 @@ void morphOps(Mat &thresh){
 
 	//dilate(inputArray source, outputArray destination,inputArray kernel). Rechteck wird über das Bild geführt und ersetzt alle Pixel mit dem Maximalwert --> Aufhellung
 	dilate(thresh, thresh, dilateElement);
+	//	dilate(thresh, thresh, dilateElement);
+
 				//imwrite( "dilate1.jpg", thresh );
 
 	//dilate(thresh, thresh, dilateElement);
@@ -76,6 +80,7 @@ void trackFilteredObject(double &x_px, double &y_px, Mat threshold, Mat &frame, 
 				Moments moment = moments((cv::Mat)contours[index]);
 				// save object area from moment class
 				double area = moment.m00;
+
 				//if the area is less than 20 px by 20px then it is probably just noise
 				//if the area is the same as the 3/2 of the image size, probably just a bad filter
 				//iteration and compare it to the area in the next iteration.
@@ -84,7 +89,6 @@ void trackFilteredObject(double &x_px, double &y_px, Mat threshold, Mat &frame, 
 					// compute x,y coordinates of the centroid
 					x_px = moment.m10 / area;
 					y_px = moment.m01 / area;
-					//std::cout << area  << std::endl;
 
 
 					// set objectFound boolean to true

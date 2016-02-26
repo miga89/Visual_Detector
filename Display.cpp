@@ -27,6 +27,13 @@ int S_MAX = 255;
 int V_MIN = 186;
 int V_MAX = 230;
 
+// mit Scheinwerfer gedreht in Kasten (beide Lichter an)
+//int H_MIN = 14;
+//int H_MAX = 30;
+//int S_MIN = 255;
+//int S_MAX = 255;
+//int V_MIN = 243;
+//int V_MAX = 255;
 // mit dem autocolor bestimmt (deckenlicht aus)
 //int H_MIN = 13;
 //int H_MAX = 17;

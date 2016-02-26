@@ -22,6 +22,7 @@ cv::KalmanFilter createKalmanFilter(int stateSize, int measSize, int contrSize, 
 
 	// B
 	kf.controlMatrix = cv::Mat::zeros(stateSize, 1,type);
+	kf.controlMatrix.at<float>(3) = -1;
 
 	// C
 	kf.measurementMatrix = cv::Mat::zeros(measSize, stateSize, type); //initialize C matrix as a zero matrix
@@ -33,10 +34,10 @@ cv::KalmanFilter createKalmanFilter(int stateSize, int measSize, int contrSize, 
 	cv::setIdentity(kf.measurementNoiseCov, cv::Scalar(1e-1)); //GEÄNDERT!!!!!!!!! R 1e-1
 
 	// Q
-	kf.processNoiseCov.at<float>(0) = 1e-2; //Q Matrix
-	kf.processNoiseCov.at<float>(5) = 1e-2;
-	kf.processNoiseCov.at<float>(10) = 5.0f;
-	kf.processNoiseCov.at<float>(15) = 5.0f;
+	kf.processNoiseCov.at<float>(0) = 1e-2;//1e-2; //Q Matrix
+	kf.processNoiseCov.at<float>(5) = 1e-2;//1e-2;
+	kf.processNoiseCov.at<float>(10) = 5.0f;//5.0f;
+	kf.processNoiseCov.at<float>(15) = 5.0f;//5.0f;
 
 	// P, initialization
 	kf.errorCovPre.at<float>(0) = 1; // px

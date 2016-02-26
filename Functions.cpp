@@ -113,6 +113,7 @@ void makePrediction(double dT, double &state_x, double &state_y, double &state_v
 	double vy_next = vy_prev + dT *( -Km * v_abs * vy_prev);
 
 
+
 	state_x = x_next * 1000;
 	state_y = y_next * 1000;
 	state_vx = vx_next * 1000;

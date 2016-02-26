@@ -2,6 +2,8 @@
 // Michael Garstka
 // Ping Pong Ball tracker
 // Version of 21.12.15
+#define _CRT_SECURE_NO_DEPRECATE
+
 #include <sstream>
 #include <string>
 #include <iostream>
@@ -20,7 +22,6 @@
 #include "ImageProcessing.h"
 #include "KalmanFilter.h"
 #include "Functions.h"
-#include "Ball.h"
 using namespace cv;
 
 

@@ -237,6 +237,10 @@ int main(int argc, char* argv[])
 			y_prev = state_y;
 			state_vx = (ballcd.x - x_prev)/dT;
 			state_vy = (ballcd.y - y_prev)/dT;
+			if (state_vx > 2) state_vx = 2;
+			if (state_vx < -2) state_vx = -2;
+			if (state_vy > 2) state_vy = 2;
+			if (state_vy < -2) state_vy = -2;
 			state_x = ballcd.x;
 			state_y = ballcd.y;
 
