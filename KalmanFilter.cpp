@@ -31,7 +31,7 @@ cv::KalmanFilter createKalmanFilter(int stateSize, int measSize, int contrSize, 
 	
 	
 	// R
-	cv::setIdentity(kf.measurementNoiseCov, cv::Scalar(1e-1)); //GEÄNDERT!!!!!!!!! R 1e-1
+	cv::setIdentity(kf.measurementNoiseCov, cv::Scalar(1e-5)); //GEÄNDERT!!!!!!!!! R 1e-1
 
 	// Q
 	kf.processNoiseCov.at<float>(0) = 1e-2;//1e-2; //Q Matrix

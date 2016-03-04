@@ -26,7 +26,8 @@
 #include "Functions.h"
 
 using namespace cv;
-
+bool displayBall = true;
+int imgCtr = 1;
 int main(int argc, char* argv[])
 {
 
@@ -52,7 +53,7 @@ int main(int argc, char* argv[])
 	state.at<float>(2) = 0;
 	state.at<float>(3) = 0;
 	cv::Mat control(contrSize, 1, type);
-	control.at<float>(0) = 1000;
+	control.at<float>(0) = 0;
 	cv::KalmanFilter kf = createKalmanFilter(stateSize, measSize, contrSize, type);
 	cv::Mat correct = meas;
 	// create Points for ball position in px and coordinates
@@ -143,13 +144,13 @@ int main(int argc, char* argv[])
 				mycase = 2;
 			}
 			// Case 3: No object detected in previous run AND object was detected within last 5 runs
-			else if (objectDetected == false && numAttempt <= 15)
+			else if (objectDetected == false && numAttempt <= 1)
 			{
 				searchSection = true; 
 				mycase = 3;
 			}
 			// Case 4: No object detected in previous run AND no object was detected within last 5 runs
-			else if (objectDetected == false && numAttempt > 15)
+			else if (objectDetected == false && numAttempt > 1)
 			{
 				searchSection = false;
 				mycase = 4;
@@ -157,8 +158,12 @@ int main(int argc, char* argv[])
 		}
 		// ----------------------------------------------------------------------------- //
 		// ----------------------------------------------------------------------------- //
-
-		frame = cameraFeed;
+		if (displayBall == false){
+			 frame = cameraFeed;
+		}
+		else{
+			cameraFeed.copyTo(frame);
+		};
 		if (searchSection == true)
 		{
 			// update transition matrix A
@@ -185,7 +190,12 @@ int main(int argc, char* argv[])
 
 			// crop the image
 			cameraFeed(predRect).copyTo(croppedFrame);
-			frame = croppedFrame;
+			if (displayBall == false){
+				 frame = croppedFrame;
+			}
+			else{
+				croppedFrame.copyTo(frame);
+			};			
 
 		}
 
@@ -193,9 +203,7 @@ int main(int argc, char* argv[])
 		cvtColor(frame, HSV, COLOR_BGR2HSV);
 		inRange(HSV, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), threshold);
 		morphOps(threshold);
-		//imwrite( "feed.jpg", cameraFeed );
-		//imwrite( "cvt.jpg", HSV );
-		//imwrite( "thresh.jpg", threshold );
+		
 		// try to track the object in the cropped threshold image and return pixel coordinates of object, otherwise return -1,-1
 		trackFilteredObject(ballpx.x, ballpx.y, threshold, frame, objectDetected, dbg);
 		if (objectDetected == true)
@@ -213,8 +221,11 @@ int main(int argc, char* argv[])
 			pxToCoordinates(ballpx.x, ballpx.y, ballcd.x, ballcd.y); 
 			
 			// draw information to screen
-			cv::circle(cameraFeed, ballpx, 3, CV_RGB(0, 0, 255), -1);
-			putText(cameraFeed, "Object Found at: x=" + dblToString(ballcd.x) + "mm (" + dblToString(ballpx.x) + "px) , y=" + dblToString(ballcd.y) + "mm (" + dblToString(ballpx.y) + "px)", Point(0, 50), 2, 1, Scalar(255, 0, 0), 2);
+			if (displayBall == true){
+				cv::circle(cameraFeed, ballpx, 3, CV_RGB(0, 0, 255), -1);
+				putText(cameraFeed, "Object Found at: x=" + dblToString(ballcd.x) + "mm (" + dblToString(ballpx.x) + "px) , y=" + dblToString(ballcd.y) + "mm (" + dblToString(ballpx.y) + "px)", Point(0, 50), 2, 1, Scalar(255, 0, 0), 2);
+			};
+			
 
 			numAttempt = 0; //set numAttempt to 0
 
@@ -231,43 +242,62 @@ int main(int argc, char* argv[])
 		else
 		{
 			numAttempt++;
-			putText(cameraFeed, "No Object Found!", Point(0, 50), 1, 2, Scalar(0, 0, 255), 2);
 			correct = kf.statePost; // save Kalman Correction=Kalman Prediction
-
+			if (displayBall == true){
+				putText(cameraFeed, "No Object Found!", Point(0, 50), 1, 2, Scalar(0, 0, 255), 2);
+			};
 		}
 
 		if (mycase == 2 || mycase ==3){
-			// draw circle into the resulting picture, centered around predicted location, and radius 2
-			cv::circle(cameraFeed, dspPredPos, 10, CV_RGB(0, 255, 0), 2);
-			cv::circle(cameraFeed, dspPredPos, 3, CV_RGB(0, 255, 0), -1);
-			// draw prediction rectangle on screen
-			cv::rectangle(cameraFeed, predRect, CV_RGB(0, 255, 0), 2);
+			if (displayBall == true){
+				// draw circle into the resulting picture, centered around predicted location, and radius 2
+				//cv::circle(cameraFeed, dspPredPos, 10, CV_RGB(0, 255, 0), 2);
+				cv::circle(cameraFeed, dspPredPos, 3, CV_RGB(0, 255, 0), -1);
+				// draw prediction rectangle on screen
+				cv::rectangle(cameraFeed, predRect, CV_RGB(0, 255, 0), 2);
+			};
 		}
 	
 		// Add information to camera feed
 		// calibration lines
-		line(cameraFeed, vertical_left_top, vertical_left_bottom, Scalar(255, 255, 255), 2, 8);
-		line(cameraFeed, vertical_right_top, vertical_right_bottom, Scalar(255, 255, 255), 2, 8);
-		line(cameraFeed, horizontal_top_left, horizontal_top_right, Scalar(255, 255, 255), 2, 8);
-		line(cameraFeed,horizontal_bottom_left, horizontal_bottom_right, Scalar(255, 255, 255), 2, 8);
-		// Additional debugging info
-		putText(cameraFeed, "xp=" + dblToString(dspPrediction.at<float>(0)) + " yp=" + dblToString(dspPrediction.at<float>(1)) + " vxp=" + dblToString(dspPrediction.at<float>(2)) + " vyp=" + dblToString(dspPrediction.at<float>(3)), Point(0, 200), 1, 2, Scalar(255, 0, 0), 2);
-		putText(cameraFeed, "xc=" + dblToString(correct.at<float>(0)) + " yc=" + dblToString(correct.at<float>(1)) + " vxc=" + dblToString(correct.at<float>(2)) + " vyc=" + dblToString(correct.at<float>(3)), Point(0, 300), 1, 2, Scalar(255, 0, 0), 2);
-		putText(cameraFeed, "case=" + intToString(mycase) , Point(0, 350), 1, 2, Scalar(255, 0, 0), 2);
-		
+		if (displayBall == true){
+			line(cameraFeed, vertical_left_top, vertical_left_bottom, Scalar(255, 255, 255), 2, 8);
+			line(cameraFeed, vertical_right_top, vertical_right_bottom, Scalar(255, 255, 255), 2, 8);
+			line(cameraFeed, horizontal_top_left, horizontal_top_right, Scalar(255, 255, 255), 2, 8);
+			line(cameraFeed,horizontal_bottom_left, horizontal_bottom_right, Scalar(255, 255, 255), 2, 8);
+			// Additional debugging info
+			putText(cameraFeed, "xp=" + dblToString(dspPrediction.at<float>(0)) + " yp=" + dblToString(dspPrediction.at<float>(1)) + " vxp=" + dblToString(dspPrediction.at<float>(2)) + " vyp=" + dblToString(dspPrediction.at<float>(3)), Point(0, 200), 1, 2, Scalar(255, 0, 0), 2);
+			putText(cameraFeed, "xc=" + dblToString(correct.at<float>(0)) + " yc=" + dblToString(correct.at<float>(1)) + " vxc=" + dblToString(correct.at<float>(2)) + " vyc=" + dblToString(correct.at<float>(3)), Point(0, 300), 1, 2, Scalar(255, 0, 0), 2);
+			putText(cameraFeed, "case=" + intToString(mycase) , Point(0, 350), 1, 2, Scalar(255, 0, 0), 2);
+		};
+
 		// used to measure FPS
 		if (counter == 10){
 			stop = (double)cv::getTickCount();
 			measuredFPS =10/((stop-start)/ cv::getTickFrequency());
 			counter = 0;
 		}
-		// display computed FPS
-		putText(cameraFeed, "FPS=" + dblToString(measuredFPS), Point(0, 100), 1, 2, Scalar(255, 0, 0), 2);
 
+		// display computed FPS
+		if (displayBall == true){
+			putText(cameraFeed, "FPS=" + dblToString(measuredFPS), Point(0, 100), 1, 2, Scalar(255, 0, 0), 2);
+		};
+		
 		// decide which images to show
 		//imshow(thresholdedImage, threshold);
+		if (displayBall == true){
 		imshow(originalImage, cameraFeed);
 		//imshow(hsvImage, HSV);
+
+		}
+		else{
+			if (objectDetected == true){
+				std::cout << "Object Found: YES,  FPS=" + dblToString(measuredFPS) + "\n";
+			}
+			else{
+				std::cout << "Object Found: NO,  FPS=" + dblToString(measuredFPS) + "\n";
+				};
+		};
 
 		// save data to text file
 		timestop = (double)cv::getTickCount();
@@ -275,11 +305,29 @@ int main(int argc, char* argv[])
 		data.open("data"+intToString(datanum)+".txt", std::ios_base::app);
 		data <<  intToString(mycase) + " " + dblToString(t) + " " + dblToString(ballcd.x) + " " + dblToString(ballcd.y)+ " "+ dblToString(ballpx.x) + " " + dblToString(ballpx.y)+"\n";
 		data.close();
-	
+	/*
+		if (mycase == 2 && ballcd.x > 2700 && ballcd.x < 3300){
+			string imgName = "feed3300" + intToString(imgCtr) + ".jpg";
+			imwrite( imgName, cameraFeed );
+			imgCtr++;
+		};
 
+
+		if (mycase == 2 && ballcd.x > 1400 && ballcd.x < 1700){
+			string imgName = "feed1600" + intToString(imgCtr) + ".jpg";
+			imwrite( imgName, cameraFeed );
+			imgCtr++;
+		};
+
+
+		if (mycase == 2 && ballcd.x > 750 && ballcd.x < 850){
+			string imgName = "feed750" + intToString(imgCtr) + ".jpg";
+			imwrite( imgName, cameraFeed );
+			imgCtr++;
+		};*/
 		// Uncomment if you want to capture a video for 20s
-		//	output_cap.write(cameraFeed);
-		//if (t>20) break;
+			//output_cap.write(cameraFeed);
+		//if (t>30) break;
 	
 		
 		//image will not appear without this waitKey() command
